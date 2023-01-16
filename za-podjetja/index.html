@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Podjetja lahko donirajo s pomočjo donatorske pogodbe, primer take pogodbe v PDF obliki.'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Podjetja lahko donirajo s pomočjo donatorske pogodbe. Primer take pogodbe v PDF obliki. Previous Next &amp;nbsp; &amp;nbsp; Page: / '>
 <title>Za podjetja</title>
 
 <link rel='canonical' href='https://nangoma2023.si/za-podjetja/'>
 
-<link rel="stylesheet" href="/scss/style.min.700db0b2e2e5d4cbe2914986f699d01e253516f12f368e985d0df4e3e6e66d49.css"><meta property='og:title' content='Za podjetja'>
-<meta property='og:description' content='Podjetja lahko donirajo s pomočjo donatorske pogodbe, primer take pogodbe v PDF obliki.'>
+<link rel="stylesheet" href="/scss/style.min.f9da2eb2f13ffdf8b68f4534e1aa1b62f3c353c6d2be805bedec0aa26ff0dc1f.css"><script type="text/javascript" src="js/countdown.js"></script><meta property='og:title' content='Za podjetja'>
+<meta property='og:description' content='Podjetja lahko donirajo s pomočjo donatorske pogodbe. Primer take pogodbe v PDF obliki. Previous Next &amp;nbsp; &amp;nbsp; Page: / '>
 <meta property='og:url' content='https://nangoma2023.si/za-podjetja/'>
 <meta property='og:site_name' content='Nangoma 2023'>
 <meta property='og:type' content='article'><meta property='article:section' content='' />
 <meta name="twitter:title" content="Za podjetja">
-<meta name="twitter:description" content="Podjetja lahko donirajo s pomočjo donatorske pogodbe, primer take pogodbe v PDF obliki.">
+<meta name="twitter:description" content="Podjetja lahko donirajo s pomočjo donatorske pogodbe. Primer take pogodbe v PDF obliki. Previous Next &amp;nbsp; &amp;nbsp; Page: / ">
     <link rel="shortcut icon" href="/favicon/favicon.ico" />
 
 
@@ -79,8 +79,6 @@
         <div class="site-meta">
             <h1 class="site-name"><a href="/">Nangoma 2023</a></h1>
             <h2 class="site-description">Humanitarna medicinska odprava</h2>
-            <h2 class="site-description">Do predvidenega odhoda:</h2>
-            <h2 class="site-description" id="countdown"></h2>
         </div>
     </header><ol class="social-menu">
             
@@ -393,7 +391,203 @@ fill="#000000" stroke="none">
     <section class="article-content">
     
     
-    <p>Podjetja lahko donirajo s pomočjo donatorske pogodbe, <a class="link" href="/za-podjetja/primer-pogodbe.pdf" >primer take pogodbe v PDF obliki</a>.</p>
+    <p>Podjetja lahko donirajo s pomočjo donatorske pogodbe. <a class="link" href="/za-podjetja/primer-pogodbe.pdf" >Primer take pogodbe v PDF obliki</a>.
+<script type="text/javascript" src= '/js/pdf-js/build/pdf.js'></script>
+<style>
+#the-canvas {
+  border: 1px solid black;
+  direction: ltr;
+  width: 100%;
+  height: auto;
+  display: none;
+}
+
+#paginator {
+  display: none;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#loadingWrapper {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 350px;
+}
+
+#loading {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #d2d0d0;;
+  border-radius: 50%;
+  border-top-color: #383838;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+</style>
+
+<div id="paginator">
+    <button id="prev">Previous</button>
+    <button id="next">Next</button>
+    &nbsp; &nbsp;
+    <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+</div>
+<div id="embed-pdf-container">
+    <div id="loadingWrapper">
+      <div id="loading"></div>
+    </div>
+    <a id="pdf-link"><canvas id="the-canvas"></canvas></a>
+</div>
+
+<script type="text/javascript">
+window.onload = function() {
+
+
+var url = "https:\/\/nangoma2023.si" + '\/za-podjetja\/primer-pogodbe.pdf';
+document.getElementById("pdf-link").href = url
+
+var hidePaginator = "false" === "true";
+var hideLoader = "" === "true";
+var selectedPageNum = parseInt("") || 1;
+
+
+var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https:\/\/nangoma2023.si" + '/js/pdf-js/build/pdf.worker.js';
+
+
+var pdfDoc = null,
+    pageNum = selectedPageNum,
+    pageRendering = false,
+    pageNumPending = null,
+    scale = 3,
+    canvas = document.getElementById('the-canvas'),
+    ctx = canvas.getContext('2d'),
+    paginator = document.getElementById("paginator"),
+    loadingWrapper = document.getElementById('loadingWrapper');
+
+
+
+showPaginator();
+showLoader();
+
+
+
+function renderPage(num) {
+  pageRendering = true;
+  
+  pdfDoc.getPage(num).then(function(page) {
+    var viewport = page.getViewport({scale: scale});
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    
+    var renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+    var renderTask = page.render(renderContext);
+
+    
+    renderTask.promise.then(function() {
+      pageRendering = false;
+      showContent();
+      
+      if (pageNumPending !== null) {
+        
+        renderPage(pageNumPending);
+        pageNumPending = null;
+      }
+    });
+  });
+
+  
+  document.getElementById('page_num').textContent = num;
+}
+
+
+
+function showContent() {
+  loadingWrapper.style.display = 'none';
+  canvas.style.display = 'block';
+}
+
+
+
+function showLoader() {
+  if(hideLoader) return
+  loadingWrapper.style.display = 'flex';
+  canvas.style.display = 'none';
+}
+
+
+
+function showPaginator() {
+  if(hidePaginator) return
+  paginator.style.display = 'block';
+}
+
+
+
+function queueRenderPage(num) {
+  if (pageRendering) {
+    pageNumPending = num;
+  } else {
+    renderPage(num);
+  }
+}
+
+
+
+function onPrevPage() {
+  if (pageNum <= 1) {
+    return;
+  }
+  pageNum--;
+  queueRenderPage(pageNum);
+}
+document.getElementById('prev').addEventListener('click', onPrevPage);
+
+
+
+function onNextPage() {
+  if (pageNum >= pdfDoc.numPages) {
+    return;
+  }
+  pageNum++;
+  queueRenderPage(pageNum);
+}
+document.getElementById('next').addEventListener('click', onNextPage);
+
+
+
+pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+  pdfDoc = pdfDoc_;
+  var numPages = pdfDoc.numPages;
+  document.getElementById('page_count').textContent = numPages;
+  
+  
+  if(pageNum > numPages) {
+    pageNum = numPages
+  }
+
+  
+  renderPage(pageNum);
+});
+}
+
+</script>
+</p>
 
 </section>
 
