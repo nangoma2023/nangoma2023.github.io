@@ -1,0 +1,1 @@
+https://upn-qr.gitapp.si/api/qrcode?client_name=I&client_address=I&client_city=1000%20Ljubljana&amount=00000001000&purpose_code=CHAR&payment_purpose=Zambija%20okt-dec%202023&iban=SI56011006030708380&reference=SI00250597&issuer_name=UL%20MF&issuer_address=Vrazov%20trg%202&issuer_city=1000%20Ljubljana
